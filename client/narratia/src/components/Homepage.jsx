@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import MakeStoryModal from "./MakeStoryModal";
 
 const ITEMS_PER_PAGE = 4; // 2 columns × 2 rows
+const BACKEND_URL = "http://localhost:5000";
 
 export default function Homepage({ currentUserId }) {
+  const [modalOpen, setModalOpen] = useState(false);
+
   const [user, setUser] = useState(null);
   const [stories, setStories] = useState([]);
   const [page, setPage] = useState(1);
@@ -13,9 +17,7 @@ export default function Homepage({ currentUserId }) {
   const [errorUser, setErrorUser] = useState(null);
   const [errorStories, setErrorStories] = useState(null);
 
-  const BACKEND_URL = "http://localhost:5000";
-
-  // Fetch current user info
+  // Fetch user info
   useEffect(() => {
     async function fetchUser() {
       if (!currentUserId) return;
@@ -34,7 +36,7 @@ export default function Homepage({ currentUserId }) {
     fetchUser();
   }, [currentUserId]);
 
-  // Fetch stories (all users)
+  // Fetch all stories
   useEffect(() => {
     async function fetchStories() {
       setLoadingStories(true);
@@ -55,12 +57,6 @@ export default function Homepage({ currentUserId }) {
     fetchStories();
   }, [page]);
 
-  // Pagination handlers
-  const handlePrevPage = () => setPage((p) => Math.max(1, p - 1));
-  const handleNextPage = () => setPage((p) => Math.min(totalPages, p + 1));
-  const handlePageClick = (num) => setPage(num);
-
-  // User initials for logo
   const userInitials =
     user && user.username
       ? user.username
@@ -71,9 +67,13 @@ export default function Homepage({ currentUserId }) {
           .toUpperCase()
       : "";
 
+  const handlePrevPage = () => setPage((p) => Math.max(1, p - 1));
+  const handleNextPage = () => setPage((p) => Math.min(totalPages, p + 1));
+  const handlePageClick = (num) => setPage(num);
+
   return (
     <div style={{ maxWidth: 900, margin: "30px auto" }}>
-      {/* Page header with app name, make a story button, and user info */}
+      {/* Header with modal trigger */}
       <header
         style={{
           marginBottom: 24,
@@ -85,6 +85,7 @@ export default function Homepage({ currentUserId }) {
         <h1 style={{ margin: 0 }}>Narratia</h1>
 
         <button
+          onClick={() => setModalOpen(true)}
           style={{
             backgroundColor: "#3182ce",
             color: "white",
@@ -94,7 +95,6 @@ export default function Homepage({ currentUserId }) {
             cursor: "pointer",
             fontWeight: "600",
           }}
-          onClick={() => alert("Make story button clicked!")}
         >
           Make a story with your idea
         </button>
@@ -174,10 +174,10 @@ export default function Homepage({ currentUserId }) {
               >
                 <h3
                   style={{
-                    margin: "0 0 10px",
+                    margin: "0 0 6px",
                     fontSize: 18,
                     color: "#2c5282",
-                    height: 48,
+                    height: 42,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                   }}
@@ -185,6 +185,20 @@ export default function Homepage({ currentUserId }) {
                 >
                   {story.prompt || "Untitled"}
                 </h3>
+
+                {/* Genre */}
+                <p
+                  style={{
+                    fontStyle: "italic",
+                    fontSize: 13,
+                    color: "#666",
+                    margin: "0 0 10px",
+                    userSelect: "none",
+                  }}
+                >
+                  Genre: {story.genre || "Unknown"}
+                </p>
+
                 <p
                   style={{
                     flex: 1,
@@ -267,6 +281,13 @@ export default function Homepage({ currentUserId }) {
           </div>
         </>
       )}
+
+      {/* Make story modal */}
+      <MakeStoryModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        currentUserId={currentUserId}
+      />
     </div>
   );
 }

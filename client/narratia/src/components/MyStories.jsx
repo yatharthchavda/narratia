@@ -89,6 +89,12 @@ useEffect(() => {
                 >
                   {story.prompt || "Untitled"}
                 </h3>
+                {/* Add genre display */}
+<p
+  style={{ fontStyle: "italic", fontSize: 13, color: "#666", margin: "4px 0" }}
+>
+  Genre: {story.genre || "Unknown"}
+</p>
                 <p
                   style={{
                     flex: 1,

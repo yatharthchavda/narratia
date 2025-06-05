@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB (Replace with your connection string)
-const uri = "mongodb://localhost:27017/narratia"; // Adjust as needed
+const uri = "mongodb+srv://yatharth:passmongo@cluster0.haliddm.mongodb.net/narratia?retryWrites=true&w=majority&appName=Cluster0"; // Adjust as needed
 
 mongoose
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })

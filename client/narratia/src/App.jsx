@@ -5,7 +5,7 @@ import MyStoriesWrapper from "./components/MyStoriesWrapper";
 
 export default function App() {
   // Replace this with actual logged-in user ID from your auth/session logic
-  const currentUserId = "64b934e8a1ebd01234567890";
+  const currentUserId = "6841d8b64ecff6fd01384c65";
 
   return (
     <Router>

@@ -1,0 +1,1 @@
+mongodb+srv://yatharth:passmongo@cluster0.haliddm.mongodb.net/narratia?retryWrites=true&w=majority&appName=Cluster0

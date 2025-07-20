@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const BACKEND_URL = "http://localhost:5000";
 
-// Mock genre options — you can extend or fetch dynamically
+
 const GENRE_OPTIONS = [
   "Fantasy",
   "Sci-Fi",
@@ -15,7 +15,7 @@ const GENRE_OPTIONS = [
   "Comedy",
 ];
 
-export default function MakeStoryModal({ isOpen, onClose, currentUserId }) {
+export default function MakeStoryModal({ isOpen, onClose, user }) {
   const [prompt, setPrompt] = useState("");
   const [genre, setGenre] = useState(GENRE_OPTIONS[0]);
   const [generatedStory, setGeneratedStory] = useState("");
@@ -60,7 +60,7 @@ export default function MakeStoryModal({ isOpen, onClose, currentUserId }) {
       setError("No generated story to publish.");
       return;
     }
-    if (!currentUserId) {
+    if (!user.id) {
       setError("User not logged in.");
       return;
     }
@@ -72,7 +72,7 @@ export default function MakeStoryModal({ isOpen, onClose, currentUserId }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: currentUserId,
+          user_id: user.id,
           prompt: prompt.trim(),
           generated_story: generatedStory,
           genre,

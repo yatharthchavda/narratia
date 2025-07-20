@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MakeStoryModal from "./MakeStoryModal";
 
-const ITEMS_PER_PAGE = 4; // 2 columns × 2 rows
+const ITEMS_PER_PAGE = 4;
 const BACKEND_URL = "http://localhost:5000";
 
-export default function Homepage({ currentUserId }) {
-  const [modalOpen, setModalOpen] = useState(false);
+export default function Homepage({ user }) {
 
-  const [user, setUser] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
   const [stories, setStories] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -17,15 +17,17 @@ export default function Homepage({ currentUserId }) {
   const [errorUser, setErrorUser] = useState(null);
   const [errorStories, setErrorStories] = useState(null);
 
-  // Fetch user info
-  useEffect(() => {
+  // Fetch user details from backend
+    useEffect(() => {
     async function fetchUser() {
-      if (!currentUserId) return;
+      if (!user?.id) return; // changed from _id to id
+
       setLoadingUser(true);
       setErrorUser(null);
+
       try {
-        const res = await axios.get(`${BACKEND_URL}/api/users/${currentUserId}`);
-        setUser(res.data);
+        const res = await axios.get(`${BACKEND_URL}/api/users/${user.id}`); // changed from _id to id
+        setUserDetails(res.data);
       } catch (err) {
         console.error("Failed to fetch user", err);
         setErrorUser("Failed to load user info");
@@ -33,10 +35,11 @@ export default function Homepage({ currentUserId }) {
         setLoadingUser(false);
       }
     }
-    fetchUser();
-  }, [currentUserId]);
 
-  // Fetch all stories
+    fetchUser();
+  }, [user]);
+
+  // Fetch stories for current page
   useEffect(() => {
     async function fetchStories() {
       setLoadingStories(true);
@@ -54,18 +57,17 @@ export default function Homepage({ currentUserId }) {
         setLoadingStories(false);
       }
     }
+
     fetchStories();
   }, [page]);
 
   const userInitials =
-    user && user.username
-      ? user.username
-          .split(" ")
-          .map((word) => word[0])
-          .join("")
-          .slice(0, 2)
-          .toUpperCase()
-      : "";
+    userDetails?.username
+      ?.split(" ")
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "";
 
   const handlePrevPage = () => setPage((p) => Math.max(1, p - 1));
   const handleNextPage = () => setPage((p) => Math.min(totalPages, p + 1));
@@ -73,7 +75,6 @@ export default function Homepage({ currentUserId }) {
 
   return (
     <div style={{ maxWidth: 900, margin: "30px auto" }}>
-      {/* Header with modal trigger */}
       <header
         style={{
           marginBottom: 24,
@@ -99,7 +100,6 @@ export default function Homepage({ currentUserId }) {
           Make a story with your idea
         </button>
 
-        {/* User logo and username */}
         <div
           style={{
             display: "flex",
@@ -113,7 +113,7 @@ export default function Homepage({ currentUserId }) {
             <div>Loading user...</div>
           ) : errorUser ? (
             <div style={{ color: "red" }}>{errorUser}</div>
-          ) : user ? (
+          ) : userDetails ? (
             <>
               <div
                 style={{
@@ -132,7 +132,7 @@ export default function Homepage({ currentUserId }) {
               >
                 {userInitials}
               </div>
-              <span>{user.username}</span>
+              <span>{userDetails.username}</span>
             </>
           ) : (
             <div>User not found</div>
@@ -140,7 +140,6 @@ export default function Homepage({ currentUserId }) {
         </div>
       </header>
 
-      {/* Stories grid */}
       {loadingStories ? (
         <p>Loading stories...</p>
       ) : errorStories ? (
@@ -186,7 +185,6 @@ export default function Homepage({ currentUserId }) {
                   {story.prompt || "Untitled"}
                 </h3>
 
-                {/* Genre */}
                 <p
                   style={{
                     fontStyle: "italic",
@@ -229,7 +227,6 @@ export default function Homepage({ currentUserId }) {
             ))}
           </div>
 
-          {/* Pagination */}
           <div
             style={{
               marginTop: 30,
@@ -282,11 +279,10 @@ export default function Homepage({ currentUserId }) {
         </>
       )}
 
-      {/* Make story modal */}
       <MakeStoryModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        currentUserId={currentUserId}
+        user={user}
       />
     </div>
   );
